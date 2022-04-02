@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="previous_item">Previous Item</string>
+    <string name="next_item">Next Item</string>
+    <string name="detailed_screen">Detailed Screen</string>
+</resources>
