@@ -1,7 +1,11 @@
 package com.sap.nasaapodapp.viewModel
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sap.nasaapodapp.data.model.NasaPhotos
 import com.sap.nasaapodapp.repository.ApodRepository
@@ -12,52 +16,58 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeFragmentViewModel @Inject constructor(
-    private val repository: ApodRepository
-) : ViewModel() {
+    private val repository: ApodRepository,
+    application: Application
+) : AndroidViewModel(application) {
 
     var apodImageResponse: MutableLiveData<NetworkResult<NasaPhotos>> = MutableLiveData()
     var apodData: MutableLiveData<NasaPhotos> = MutableLiveData()
 
     init {
-        getApodData(5)
+        getApodData(100)
     }
 
     fun getApodData(count: Int) {
         viewModelScope.launch {
-            try {
-                val response = repository.getData(count)
-                NetworkResult.Loading(null)
-                val responseList: NetworkResult<NasaPhotos> = when {
-                    response.message().toString().contains("timeout") -> {
-                        NetworkResult.Error(data = null, message = "Time Out")
+            if (checkInternetConnection()) {
+                apodImageResponse.value = NetworkResult.Loading(null)
+                try {
+                    val response = repository.getData(count)
+                    val responseList: NetworkResult<NasaPhotos> = when {
+                        response.message().toString().contains("timeout") -> {
+                            NetworkResult.Error(data = null, message = "Time Out")
+                        }
+                        response.isSuccessful -> {
+                            val apodResponse = response.body()
+                            apodData.postValue(apodResponse!!)
+                            NetworkResult.Success(data = apodResponse)
+                        }
+                        else -> {
+                            NetworkResult.Error(message = "Could Not Fetch Results")
+                        }
                     }
-                    response.isSuccessful -> {
-                        val apodResponse = response.body()
-                        apodData.postValue(apodResponse!!)
-                        NetworkResult.Success(data = apodResponse)
-                    }
-                    else -> {
-                        NetworkResult.Error(message = "Could Not Fetch Results")
-                    }
+                    apodImageResponse.postValue(responseList)
+                } catch (e: Exception) {
+                    apodImageResponse.postValue(NetworkResult.Error(message = e.message!!))
                 }
-                apodImageResponse.postValue(responseList)
-            } catch (e: Exception) {
-                apodImageResponse.postValue(NetworkResult.Error(message = e.message!!))
+            } else {
+                apodImageResponse.value = NetworkResult.Error(message = "No Internet Connection")
             }
+
         }
     }
 
 
-/*    private fun checkInternetConnection(): Boolean {
+    fun checkInternetConnection(): Boolean {
         val connectivityManager =
-            getApplication(Application().baseContext).getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork?: return false
+            getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-        return when{
+        return when {
             capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
             capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
             capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
             else -> false
         }
-    }*/
+    }
 }

@@ -66,12 +66,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), RecyclerViewInterface 
                 is NetworkResult.Success -> {
                     val responseBody = it.data
                     apodAdapter.submitList(responseBody)
+                    binding.apply {
+                        pbLoadingItems.isVisible = false
+                        rvPhotos.isVisible = true
+                    }
                 }
                 is NetworkResult.Error -> {
                     binding.apply {
                         pbLoadingItems.isVisible = false
                         rvPhotos.isVisible = false
+                        txtNoConnection.isVisible = true
+                        txtNoConnection.text =
+                            if (viewModel.checkInternetConnection()) "Something Went Wrong" else "No Internet Connection"
                     }
+
                 }
                 is NetworkResult.Loading -> {
                     binding.apply {

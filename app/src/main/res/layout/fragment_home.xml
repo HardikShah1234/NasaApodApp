@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.HomeFragment">
 
     <LinearLayout
         android:id="@+id/llRecyclerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <ProgressBar
             android:id="@+id/pbLoadingItems"
@@ -18,11 +19,21 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/txtNoConnection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:text="No Internet Connection" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_photos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="4dp"
+            android:visibility="visible"
             android:scrollbars="horizontal">
 
         </androidx.recyclerview.widget.RecyclerView>
