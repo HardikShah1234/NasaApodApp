@@ -3,7 +3,7 @@ This App fetch the data from [Nasa Api](https://api.nasa.gov/) and photo search 
 
 *Technical Description*
 ------------------------------
-This app is developed using Kotlin programming language, Kotlin Coroutines ,MVVM architecture, Dagger Hilt, Navigation, Fragment, Glide for image loading ,API Calls using Retrofit and other android libraries such as pagination.
+This app is developed using Kotlin programming language, Kotlin Coroutines ,MVVM architecture, Dagger Hilt, Navigation, Fragment, Glide for image loading ,API Calls using Retrofit and other android libraries.
 
 
 *About the App*
